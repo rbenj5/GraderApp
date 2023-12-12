@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grader of the Future</title>
+</head>
+<body>
+    <h1>Grader of the Future</h1>
+    <img id="doctorImage" src="{{ url_for('static', filename='images/Doctor.png') }}" alt="Doctor Image">
+    <p>Copy and paste your text here:</p>
+    <form id="gradingForm">
+        <textarea name="student_work" rows="10" cols="40"></textarea>
+        <button type="submit">Grade!</button>
+    </form>
+    <div id="result">
+        <!-- Your grading results will be displayed here -->
+    </div>
+
+    <script>
+        document.getElementById('gradingForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            var studentText = document.querySelector('textarea[name="student_work"]').value;
+
+            fetch('/grade', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ studentWork: studentText })
+            })
+            .then(response => response.json())
+            .then(updateUI);
+        });
+
+        function updateUI({grade, feedback}) {
+            var newImageSrc;
+            if (grade === 'A') {
+                newImageSrc = "{{ url_for('static', filename='images/Snoop.png') }}";
+            } else if (grade === 'B') {
+                newImageSrc = "{{ url_for('static', filename='images/Arnold.png') }}";
+            } else {
+                newImageSrc = "{{ url_for('static', filename='images/Stewie.png') }}";
+            }
+
+            document.getElementById('doctorImage').src = newImageSrc;
+            document.getElementById('result').innerHTML = "Student Grade: " + grade + " " + feedback;
+        }
+    </script>
+</body>
+</html>
